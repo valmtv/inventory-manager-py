@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 class Item(ABC):
 
-    # disbles __dict__ (states no more attributes can be added)
+    # disables __dict__ (states no more attributes can be added)
     __slots__ = ('_item_id', '_name', '_quantity', '_price')
 
     def __init__(self, item_id: str, name: str, quantity: int, price: float):
@@ -63,9 +63,8 @@ class Item(ABC):
         return f"Item: {self.name} (ID: {self.item_id}), Quantity: {self.quantity}, Price: ${self.price:.2f}"
 
 
-# Electronics class
 class Electronics(Item):
-    __slots__ = ('_warranty_months',)
+    __slots__ = ('_warranty_months',) # ',' makes it treated like a tuple
 
     def __init__(self, item_id: str, name: str, quantity: int, price: float, warranty_months: int):
         super().__init__(item_id, name, quantity, price)
@@ -81,9 +80,34 @@ class Electronics(Item):
 
 
     def display(self) -> str:
-        return (f"[Electronics] ID: {self.item_id} | Name: {self.name} | Quantity: {self.quantity} " 
-        f"| Price: ${self.price:.2f} | Warranty: {self.warranty_months} months")
+        return (f"[Electronics] ID: {self.item_id} | Name: {self.name} | Qty: {self.quantity} " 
+        f"| Price: {self.price:.2f} | Warranty: {self.warranty_months} months")
 
 
     def category(self) -> str:
-        return f"{self.__class__.__name__}"
+        return self.__class__.__name__
+
+
+class Grocery(Item):
+    __slots__ = ('_expiration_date',)
+
+    def __init__(self, item_id: str, name: str, quantity: int, price: float, expiration_date: str):
+        super().__init__(item_id, name, quantity, price)
+        self.expiration_date = expiration_date
+
+    @property
+    def expiration_date(self) -> str:
+        return self._expiration_date
+
+    @expiration_date.setter
+    def expiration_date(self, value: str) -> None:
+        self._expiration_date = value
+
+
+    def display(self) -> str:
+        return (f"[Grocery] ID: {self.item_id} | Name: {self.name} | Qty: {self.quantity} " 
+                f"| Price: {self.price:.2f} | Expires: {self.expiration_date}")
+
+
+    def category(self) -> str:
+        return self.__class__.__name__
