@@ -18,6 +18,7 @@ class Inventory:
 
 
     # Core methods
+    # TODO: Simple for now, later with exceptions and checks
     def add_item(self, item: Item) -> None:
         self._items[item.item_id] = item
 
