@@ -46,7 +46,6 @@ class Item(ABC):
         self._price = value
 
 
-    # Abstract methods to be implemented by subclasses
     @abstractmethod
     def display(self) -> str:
         pass
@@ -55,7 +54,7 @@ class Item(ABC):
     def category(self) -> str:
         pass
 
-    # String parser ( called dunder methods) 
+    # String parser (called dunder methods) 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(item_id='{self.item_id}', name='{self.name}', quantity={self.quantity}, price={self.price})"
 
