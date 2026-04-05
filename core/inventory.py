@@ -67,8 +67,8 @@ class Inventory:
 
     def display_inventory(self) -> None:
         # Works because of __iter__
-        for item in self:
-            print(item.display())
+        lines = [item.display() for item in self]
+        print('\n'.join(lines))
 
     def items_by_category(self, category: str):
         """Yields items matching the given category."""
@@ -80,8 +80,7 @@ class Inventory:
     def from_list(cls, items: list[Item]) -> "Inventory":
         """Creates an Inventory instance from a list of Item objects"""
         inventory = cls()
-        for item in items:
-            inventory.add_item(item)
+        inventory._items = {item.item_id: item for item in items}
         return inventory
 
     @staticmethod
