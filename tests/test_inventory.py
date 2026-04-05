@@ -2,7 +2,7 @@ import pytest
 from core.models import Electronics, Grocery
 from core.inventory import Inventory
 from core.utils import filter_items, sort_items, most_expensive, below_quantity_threshold
-from core.exceptions import ItemNotFoundException
+from core.exceptions import ItemNotFoundException, DuplicateItemException, InvalidValueException
 
 # shared fixtures
 def make_items():
@@ -96,3 +96,9 @@ def test_item_not_found():
     with pytest.raises(ItemNotFoundException) as exc_info:
         inv.update_quantity("FAKE", 10)
     assert exc_info.value.item_id == "FAKE"
+
+def test_duplicate_item():
+    inv = make_inventory()
+    with pytest.raises(DuplicateItemException) as exc_info:
+        inv.add_item(Electronics("E1", "Duplicate Phone", 5, 499.99, 12))
+    assert exc_info.value.item_id == "E1"

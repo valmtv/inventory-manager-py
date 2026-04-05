@@ -2,7 +2,7 @@ from typing import Iterator
 from core.models import Item
 import functools
 from datetime import datetime
-from core.exceptions import ItemNotFoundException
+from core.exceptions import ItemNotFoundException, DuplicateItemException, InvalidValueException
 
 def log_operation(func):
     @functools.wraps(func)
@@ -35,6 +35,8 @@ class Inventory:
     # TODO: Simple for now, later with exceptions and checks
     @log_operation
     def add_item(self, item: Item) -> None:
+        if item.item_id in self._items:
+            raise DuplicateItemException(item.item_id, f"Item with ID '{item.item_id}' already exists in inventory.")
         self._items[item.item_id] = item
 
     @log_operation
