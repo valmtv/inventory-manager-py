@@ -119,7 +119,7 @@ def test_invalid_value():
 def test_read_from_file():
     """Tests reading and creating inventory from inventory.csv"""
     inv = Inventory()
-    inv.read_from_file("inventory.csv")
+    inv.read_from_file("assets/inventory.csv")
     
     assert len(inv) == 4
     assert "E1" in inv
