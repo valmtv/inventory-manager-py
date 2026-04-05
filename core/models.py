@@ -83,8 +83,9 @@ class Electronics(Item):
 
 
     def display(self) -> str:
-        return (f"[Electronics] ID: {self.item_id} | Name: {self.name} | Qty: {self.quantity} " 
-        f"| Price: {self.price:.2f} | Warranty: {self.warranty_months} months")
+        return (f"[Electronics] ID: {self.item_id:<4} | Name: {self.name:<15} | "
+                f"Qty: {self.quantity:<4} | Price: ${self.price:<8.2f} | "
+                f"Warranty: {self.warranty_months} months")
 
 
     def category(self) -> str:
@@ -108,8 +109,9 @@ class Grocery(Item):
 
 
     def display(self) -> str:
-        return (f"[Grocery] ID: {self.item_id} | Name: {self.name} | Qty: {self.quantity} " 
-                f"| Price: {self.price:.2f} | Expires: {self.expiration_date}")
+        return (f"[Grocery]     ID: {self.item_id:<4} | Name: {self.name:<15} | "
+                f"Qty: {self.quantity:<4} | Price: ${self.price:<8.2f} | "
+                f"Expires: {self.expiration_date}")
 
 
     def category(self) -> str:
