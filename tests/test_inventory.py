@@ -2,7 +2,13 @@ import pytest
 from core.models import Electronics, Grocery
 from core.inventory import Inventory
 from core.utils import filter_items, sort_items, most_expensive, below_quantity_threshold
-from core.exceptions import ItemNotFoundException, DuplicateItemException, InvalidValueException
+from core.exceptions import (
+    ItemNotFoundException,
+    DuplicateItemException,
+    InvalidValueException,
+    InventoryException
+)
+import os
 
 # shared fixtures
 def make_items():
@@ -86,7 +92,6 @@ def test_below_quantity_threshold():
     low_stock = below_quantity_threshold(inv, threshold=15)
     assert len(low_stock) == 2
 
-
 def test_item_not_found():
     inv = make_inventory()
     with pytest.raises(ItemNotFoundException) as exc_info:
@@ -110,3 +115,21 @@ def test_invalid_value():
 
     with pytest.raises(InvalidValueException):
         inv._items["E1"].price = -100
+        
+def test_read_from_file():
+    """Tests reading and creating inventory from the inventory.csv"""
+    inv = Inventory()
+    inv.read_from_file("inventory.csv")
+    
+    assert len(inv) == 4
+    assert "E1" in inv
+    assert "G1" in inv
+    
+    assert isinstance(inv._items["E1"], Electronics)
+    assert isinstance(inv._items["G1"], Grocery)
+
+def test_read_from_file_not_found():
+    """Test if the program doesnt crash when no file is found"""
+    inv = Inventory()
+    with pytest.raises(InventoryException):
+        inv.read_from_file("this_file_does_not_exist.csv")
