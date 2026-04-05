@@ -4,13 +4,13 @@ import functools
 from datetime import datetime
 
 def log_operation(func):
-    @functools.wraps(func) # Keep func data
+    @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
-        start_time = datetime.now()
-        print(f"[{start_time}] Calling {func.__name__}... ")
+        start = datetime.now()
+        print(f"[{start.strftime('%Y-%m-%d %H:%M:%S')}] Calling {func.__name__}...")
         result = func(self, *args, **kwargs)
-        end_time = datetime.now()
-        print(f"[{end_time}] {func.__name__} completed in {end_time - start_time}s")
+        end = datetime.now()
+        print(f"[{end.strftime('%Y-%m-%d %H:%M:%S')}] {func.__name__} completed in {(end - start).total_seconds():.4f}s")
         return result
     return wrapper
 
