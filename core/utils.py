@@ -14,3 +14,8 @@ def sort_items(inventory: Inventory, key_fn: Callable[[Item], Any], reverse: boo
 def most_expensive(inventory: Inventory) -> Item:
     """Returns the item with the highest price."""
     return max(inventory, key=lambda item: item.price)
+
+def below_quantity_threshold(inventory: Inventory, threshold: int) -> list[Item]:
+    """Returns items with quantity below the threshold."""
+    return filter_items(inventory, lambda item: item.quantity < threshold)
+

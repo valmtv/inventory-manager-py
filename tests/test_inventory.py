@@ -1,6 +1,6 @@
 from core.models import Electronics, Grocery
 from core.inventory import Inventory
-from core.utils import filter_items, sort_items, most_expensive
+from core.utils import filter_items, sort_items, most_expensive, below_quantity_threshold
 
 # Basic functionality
 inv = Inventory()
@@ -69,6 +69,8 @@ assert sorted_by_name[0].name == "Apple"
 most_exp = most_expensive(inv2)
 assert most_exp.name == "Laptop"
 
-
+# below_quantity_threshold
+low_stock = below_quantity_threshold(inv2, threshold=10)
+assert len(low_stock) == 2  # Phone (5) and Laptop (5)
 
 print("All correct")
