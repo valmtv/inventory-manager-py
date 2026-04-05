@@ -98,36 +98,32 @@ class Inventory:
                 reader = csv.DictReader(file, fieldnames=headers)
 
                 for row in reader:
-                    # strip whitespaces just in case 
-                    item_id = row['item_id'].strip()
-                    category = row['category'].strip()
-                    name = row['name'].strip()
+                    try:
+                        item_id = row['item_id'].strip()
+                        category = row['category'].strip()
+                        name = row['name'].strip()
+                        quantity = int(row['quantity'].strip())
+                        price = float(row['price'].strip())
+                        extra = row['extra'].strip()
 
-                    # Typecast numeric values
-                    quantity = int(row['quantity'].strip())
-                    price = float(row['price'].strip())
-                    extra = row['extra'].strip()
+                        item: Item
+                        if category == 'Electronics':
+                            item = Electronics(item_id, name, quantity, price, int(extra))
+                        elif category == 'Grocery':
+                            item = Grocery(item_id, name, quantity, price, extra)
+                        else:
+                            print(f"Warning: Skipping row with unknown category '{category}' (ID: '{item_id}').")
+                            continue
 
-                    item: Item # prevent type error
-                    if category == 'Electronics':
-                        # extra represents warranty_months (int)
-                        item = Electronics(item_id, name, quantity, price, int(extra))
-                    elif category == 'Grocery':
-                        # extra represents expiration_date (str)
-                        item = Grocery(item_id, name, quantity, price, extra)
-                    else:
-                        # Skip unknown categories to prevent crashing
-                        print(f"Warning: Unknown category '{category}' for item '{item_id}' Skipping...")
-                        continue
+                        self.add_item(item)
 
-                    self.add_item(item)
+                    except (ValueError, InvalidValueException) as e:
+                        print(f"Warning: Skipping row with ID '{row.get('item_id', '?').strip()}' — {e}")
+                    except DuplicateItemException as e:
+                        print(f"Warning: Skipping duplicate ID '{e.item_id}' found in file.")
 
         except OSError as e:
-            # Catches FileNotFoundError PermissionError etc...
             raise InventoryException(f"Failed to read from file '{filename}'") from e
-        except ValueError as e:
-            # Catches issues if the CSV has bad data (e.g. trying to int() a string like "abc")
-            raise InventoryException(f"Data formatting error in file '{filename}'") from e
 
     @log_operation
     def write_to_file(self, filename: str) -> None:
