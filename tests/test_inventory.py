@@ -133,8 +133,9 @@ def test_read_from_file_not_found():
     inv = Inventory()
     with pytest.raises(InventoryException):
         inv.read_from_file("this_file_does_not_exist.csv")
-        
+
 def test_write_to_file(tmp_path):
+    """Tests writing inventory to CSV file"""
     inv = make_inventory()
     filepath = tmp_path / "test_output.csv"
     inv.write_to_file(str(filepath))
@@ -151,3 +152,10 @@ def test_write_to_file(tmp_path):
     assert inv2._items["E1"].price == 699.99
     assert cast(Electronics, inv2._items["E2"]).warranty_months == 12
     assert cast(Grocery, inv2._items["G1"]).expiration_date == "2026-06-01"
+
+def test_read_bad_data(tmp_path):
+    bad_csv = tmp_path / "bad.csv"
+    bad_csv.write_text("E1,Electronics,Phone,notanumber,699.99,24\n")
+    inv = Inventory()
+    with pytest.raises(InventoryException):
+        inv.read_from_file(str(bad_csv))
