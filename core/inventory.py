@@ -2,14 +2,18 @@ from typing import Iterator
 from core.models import Item
 import functools
 from datetime import datetime
-from core.exceptions import ItemNotFoundException, DuplicateItemException
+from core.exceptions import InvalidValueException, ItemNotFoundException, DuplicateItemException
 
 def log_operation(func):
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
         start = datetime.now()
         print(f"[{start.strftime('%Y-%m-%d %H:%M:%S')}] Calling {func.__name__}...")
-        result = func(self, *args, **kwargs)
+        try:
+            result = func(self, *args, **kwargs)
+        except Exception as e:
+            print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {func.__name__} failed: {e}")
+            raise
         end = datetime.now()
         print(f"[{end.strftime('%Y-%m-%d %H:%M:%S')}] {func.__name__} completed in {(end - start).total_seconds():.4f}s")
         return result
@@ -34,6 +38,8 @@ class Inventory:
     # Core methods
     @log_operation
     def add_item(self, item: Item) -> None:
+        if not Inventory.is_valid_id(item.item_id): # just to use the method at least once, ofc in real life would be much more complex etc
+            raise InvalidValueException(f"Invalid item ID: '{item.item_id}'")
         if item.item_id in self: # triggers __contains__
             raise DuplicateItemException(item.item_id, f"Item with ID '{item.item_id}' already exists in inventory.")
         self._items[item.item_id] = item

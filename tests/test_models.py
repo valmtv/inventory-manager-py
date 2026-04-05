@@ -1,4 +1,6 @@
+import pytest
 from core.models import Electronics, Grocery
+from core.exceptions import InvalidValueException
 
 def test_electronics():
     e = Electronics("E1", "Phone", 10, 699.99, 24)
@@ -16,3 +18,11 @@ def test_grocery():
     assert g.expiration_date == "2026-06-01"
     assert g.category() == "Grocery"
     assert "Expires: 2026-06-01" in g.display()
+
+def test_invalid_quantity():
+    with pytest.raises(InvalidValueException):
+        Electronics("E1", "Phone", -1, 699.99, 24)
+
+def test_invalid_price():
+    with pytest.raises(InvalidValueException):
+        Electronics("E1", "Phone", 10, -1.0, 24)

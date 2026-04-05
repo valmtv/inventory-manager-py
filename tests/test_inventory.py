@@ -102,3 +102,11 @@ def test_duplicate_item():
     with pytest.raises(DuplicateItemException) as exc_info:
         inv.add_item(Electronics("E1", "Duplicate Phone", 5, 499.99, 12))
     assert exc_info.value.item_id == "E1"
+
+def test_invalid_value():
+    inv = make_inventory()
+    with pytest.raises(InvalidValueException):
+        inv.update_quantity("E1", -5)
+
+    with pytest.raises(InvalidValueException):
+        inv._items["E1"].price = -100

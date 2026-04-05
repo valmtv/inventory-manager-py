@@ -2,7 +2,7 @@ from typing import Callable, Any
 from core.models import Item 
 from core.inventory import Inventory
 
-# Dependancy injection function wrappers
+# Dependency injection function wrappers & utilities
 def filter_items(inventory: Inventory, predicate: Callable[[Item], bool]) -> list[Item]:
     """Returns items matching the predicate."""
     return list(filter(predicate, inventory)) # predicate takes Item and returns bool
