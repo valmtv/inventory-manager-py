@@ -2,6 +2,7 @@ from typing import Iterator
 from core.models import Item
 import functools
 from datetime import datetime
+from core.exceptions import ItemNotFoundException
 
 def log_operation(func):
     @functools.wraps(func)
@@ -38,11 +39,17 @@ class Inventory:
 
     @log_operation
     def remove_item(self, item_id: str) -> None:
-        del self._items[item_id]
+        try:
+            del self._items[item_id]
+        except KeyError:
+            raise ItemNotFoundException(item_id, f"Item with ID '{item_id}' not found.") from None
 
     @log_operation
     def update_quantity(self, item_id: str, quantity: int) -> None:
-        self._items[item_id].quantity = quantity
+        try:
+            self._items[item_id].quantity = quantity
+        except KeyError:
+            raise ItemNotFoundException(item_id, f"Item with ID '{item_id}' not found.") from None
 
     def display_inventory(self) -> None:
         # Works because of __iter__
