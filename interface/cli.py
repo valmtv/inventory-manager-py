@@ -1,7 +1,19 @@
 from core.inventory import Inventory
 from core.models import Electronics, Grocery, Item
-from core.exceptions import InventoryException
+from core.exceptions import InventoryException, InvalidValueException
 from core.utils import sort_items, most_expensive, below_quantity_threshold
+
+def _to_int(value: str, field: str = "value") -> int:
+    try:
+        return int(value)
+    except ValueError:
+        raise InvalidValueException(f"'{field}' must be a valid integer.")
+
+def _to_float(value: str, field: str = "value") -> float:
+    try:
+        return float(value)
+    except ValueError:
+        raise InvalidValueException(f"'{field}' must be a valid number.")
 
 def print_menu():
     print("\n" + "="*35)
@@ -32,9 +44,9 @@ def run_cli():
                 case "1":
                     item_id = input("Enter Item ID: ").strip()
                     name = input("Enter Name: ").strip()
-                    quantity = int(input("Enter Quantity: ").strip())
-                    price = float(input("Enter Price: ").strip())
-                    warranty = int(input("Enter Warranty (months): ").strip())
+                    quantity = _to_int(input("Enter Quantity: ").strip(), "Quantity")
+                    price = _to_float(input("Enter Price: ").strip(), "Price")
+                    warranty = _to_int(input("Enter Warranty (months): ").strip(), "Warranty")
                     item: Item = Electronics(item_id, name, quantity, price, warranty)
                     inventory.add_item(item)
                     print(f"Success: Added '{name}' to inventory.")
@@ -42,8 +54,8 @@ def run_cli():
                 case "2":
                     item_id = input("Enter Item ID: ").strip()
                     name = input("Enter Name: ").strip()
-                    quantity = int(input("Enter Quantity: ").strip())
-                    price = float(input("Enter Price: ").strip())
+                    quantity = _to_int(input("Enter Quantity: ").strip(), "Quantity")
+                    price = _to_float(input("Enter Price: ").strip(), "Price")
                     expiry = input("Enter Expiration Date (YYYY-MM-DD): ").strip()
                     item = Grocery(item_id, name, quantity, price, expiry)
                     inventory.add_item(item)
@@ -56,7 +68,7 @@ def run_cli():
 
                 case "4":
                     item_id = input("Enter Item ID to update: ").strip()
-                    quantity = int(input("Enter new Quantity: ").strip())
+                    quantity = _to_int(input("Enter new Quantity: ").strip(), "Quantity")
                     inventory.update_quantity(item_id, quantity)
                     print(f"Success: Item '{item_id}' quantity updated to {quantity}.")
 
@@ -85,7 +97,7 @@ def run_cli():
                         print(f"\nMost Expensive Item:\n{expensive.display()}")
 
                 case "9":
-                    threshold = int(input("Enter quantity threshold: ").strip())
+                    threshold = _to_int(input("Enter quantity threshold: ").strip(), "Threshold")
                     low: list[Item] = below_quantity_threshold(inventory, threshold)
                     print(f"\n--- Items below {threshold} quantity ---")
                     if not low:
@@ -112,9 +124,6 @@ def run_cli():
 
         except InventoryException as e:
             print(f"\nError: {e}")
-        except ValueError:
-            # Catches casting errors (e.g. user types "ten" instead of "10" for quantity)
-            print("\nError: Expected a number but received text. Please try again.")
         except Exception as e:
             # Prevent crashing of cli
             print(f"\nError: An unexpected error occurred: {e}")
