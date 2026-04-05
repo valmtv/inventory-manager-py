@@ -37,7 +37,7 @@ class Item(ABC):
     @quantity.setter
     def quantity(self, value: int) -> None:
         if value < 0:
-            raise InvalidValueException("Quantity cannot be negative.") from None
+            raise InvalidValueException("Quantity must be a non-negative integer.") from None
         self._quantity = value
 
     @property
