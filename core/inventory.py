@@ -8,7 +8,7 @@ from core.exceptions import (
     DuplicateItemException,
     InventoryException
 )
-from core.models import Electronics, Grocery
+from core.models import Electronics, Grocery, Item
 import csv
 
 def log_operation(func):
@@ -109,6 +109,7 @@ class Inventory:
                     price = float(row['price'].strip())
                     extra = row['extra'].strip()
 
+                    item: Item # prevent type error
                     if category == 'Electronics':
                         # extra represents warranty_months (int)
                         item = Electronics(item_id, name, quantity, price, int(extra))
