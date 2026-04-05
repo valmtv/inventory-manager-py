@@ -2,7 +2,14 @@ from typing import Iterator
 from core.models import Item
 import functools
 from datetime import datetime
-from core.exceptions import InvalidValueException, ItemNotFoundException, DuplicateItemException
+from core.exceptions import (
+    InvalidValueException,
+    ItemNotFoundException,
+    DuplicateItemException,
+    InventoryException
+)
+from core.models import Electronics, Grocery
+import csv
 
 def log_operation(func):
     @functools.wraps(func)
@@ -81,3 +88,43 @@ class Inventory:
     def is_valid_id(item_id: str) -> bool:
         """Checks if the given item ID is valid (e.g. non-empty and alphanumeric)"""
         return bool(item_id) and item_id.isalnum() # isalnum will reject "E-1" or with '_'
+
+    @log_operation
+    def read_from_file(self, filename: str) -> None:
+        """Populates the inventory from a CSV file"""
+        headers = ['item_id', 'category', 'name', 'quantity', 'price', 'extra']
+
+        try:
+            with open(filename, mode='r', encoding='utf-8') as file:
+                reader = csv.DictReader(file, fieldnames=headers)
+
+                for row in reader:
+                    # strip whitespaces just in case 
+                    item_id = row['item_id'].strip()
+                    category = row['category'].strip()
+                    name = row['name'].strip()
+
+                    # Typecast numeric values
+                    quantity = int(row['quantity'].strip())
+                    price = float(row['price'].strip())
+                    extra = row['extra'].strip()
+
+                    if category == 'Electronics':
+                        # extra represents warranty_months (int)
+                        item = Electronics(item_id, name, quantity, price, int(extra))
+                    elif category == 'Grocery':
+                        # extra represents expiration_date (str)
+                        item = Grocery(item_id, name, quantity, price, extra)
+                    else:
+                        # Skip unknown categories to prevent crashing
+                        print(f"Warning: Unknown category '{category}' for item '{item_id}' Skipping...")
+                        continue
+
+                    self.add_item(item)
+
+        except OSError as e:
+            # Catches FileNotFoundError PermissionError etc...
+            raise InventoryException(f"Failed to read from file '{filename}'") from e
+        except ValueError as e:
+            # Catches issues if the CSV has bad data (e.g. trying to int() a string like "abc")
+            raise InventoryException(f"Data formatting error in file '{filename}'") from e
