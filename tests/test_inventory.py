@@ -25,4 +25,19 @@ assert len(list(inv.items_by_category("Electronics"))) == 2
 inv.remove_item("G1")
 assert len(inv) == 3
 assert "G1" not in inv
+
+
+# from_list
+inv2 = Inventory.from_list([e, e2, g, g2])
+assert len(inv2) == 4
+assert "E1" in inv2
+assert "G2" in inv2
+
+# is_valid_id
+assert Inventory.is_valid_id("E1") == True
+assert Inventory.is_valid_id("ABC123") == True
+assert Inventory.is_valid_id("") == False
+assert Inventory.is_valid_id("E-1") == False
+assert Inventory.is_valid_id("E 1") == False
+
 print("All correct")

@@ -1,3 +1,4 @@
 fix spacing for the display
 apply is_valid_id() to the methods once exceptions are implemented
 maybe imrpove is_valid_id()
+maybe round the log seconds up
