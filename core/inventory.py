@@ -55,3 +55,15 @@ class Inventory:
             if item.category() == category:
                 yield item
 
+    @classmethod
+    def from_list(cls, items: list[Item]) -> "Inventory":
+        """Creates an Inventory instance from a list of Item objects"""
+        inventory = cls()
+        for item in items:
+            inventory.add_item(item)
+        return inventory
+
+    @staticmethod
+    def is_valid_id(item_id: str) -> bool:
+        """Checks if the given item ID is valid (e.g. non-empty and alphanumeric)"""
+        return bool(item_id) and item_id.isalnum() # isalnum will reject "E-1" or with '_'
