@@ -54,7 +54,7 @@ class Item(ABC):
     def category(self) -> str:
         pass
 
-    # String parser (called dunder methods) 
+    # String representations (are dunder(__a__) methods) 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(item_id='{self.item_id}', name='{self.name}', quantity={self.quantity}, price={self.price})"
 
