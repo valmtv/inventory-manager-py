@@ -91,7 +91,7 @@ class Inventory:
 
     @log_operation
     def read_from_file(self, filename: str) -> None:
-        """Populates the inventory from a CSV file"""
+        """Populates inventory from CSV file"""
         headers = ['item_id', 'category', 'name', 'quantity', 'price', 'extra']
 
         try:
@@ -129,3 +129,34 @@ class Inventory:
         except ValueError as e:
             # Catches issues if the CSV has bad data (e.g. trying to int() a string like "abc")
             raise InventoryException(f"Data formatting error in file '{filename}'") from e
+
+    @log_operation
+    def write_to_file(self, filename: str) -> None:
+        """Save current inventory to CSV file"""
+        headers = ['item_id', 'category', 'name', 'quantity', 'price', 'extra']
+        
+        try:
+            # newline='' is required by the csv module to prevent blank lines between rows on Windows
+            with open(filename, mode='w', encoding='utf-8', newline='') as file:
+                writer = csv.DictWriter(file, fieldnames=headers)
+                for item in self:
+                    extra_val: int | str
+                    if isinstance(item, Electronics):
+                        extra_val = item.warranty_months
+                    elif isinstance(item, Grocery):
+                        extra_val = item.expiration_date
+                    
+                    # Build the dictionary for the row
+                    row_data = {
+                        'item_id': item.item_id,
+                        'category': item.category(),
+                        'name': item.name,
+                        'quantity': item.quantity,
+                        'price': f"{item.price:.2f}", # Avoid precision issues 
+                        'extra': extra_val
+                    }
+                    
+                    writer.writerow(row_data)
+                    
+        except OSError as e:
+            raise InventoryException(f"Failed to write to file '{filename}'.") from e
