@@ -11,3 +11,6 @@ def sort_items(inventory: Inventory, key_fn: Callable[[Item], Any], reverse: boo
     """Returns items sorted by the given key function."""
     return sorted(inventory, key=key_fn, reverse=reverse)
 
+def most_expensive(inventory: Inventory) -> Item:
+    """Returns the item with the highest price."""
+    return max(inventory, key=lambda item: item.price)

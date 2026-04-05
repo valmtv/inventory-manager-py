@@ -1,6 +1,6 @@
 from core.models import Electronics, Grocery
 from core.inventory import Inventory
-from core.utils import filter_items, sort_items 
+from core.utils import filter_items, sort_items, most_expensive
 
 # Basic functionality
 inv = Inventory()
@@ -64,6 +64,10 @@ assert prices_desc == sorted(prices_desc, reverse=True)
 
 sorted_by_name = sort_items(inv2, key_fn=lambda item: item.name)
 assert sorted_by_name[0].name == "Apple"
+
+# most_expensive
+most_exp = most_expensive(inv2)
+assert most_exp.name == "Laptop"
 
 
 
