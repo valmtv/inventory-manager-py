@@ -2,7 +2,14 @@ from typing import Iterator
 from core.models import Item
 import functools
 from datetime import datetime
-from core.exceptions import InvalidValueException, ItemNotFoundException, DuplicateItemException
+from core.exceptions import (
+    InvalidValueException,
+    ItemNotFoundException,
+    DuplicateItemException,
+    InventoryException
+)
+from core.models import Electronics, Grocery, Item
+import csv
 
 def log_operation(func):
     @functools.wraps(func)
@@ -81,3 +88,75 @@ class Inventory:
     def is_valid_id(item_id: str) -> bool:
         """Checks if the given item ID is valid (e.g. non-empty and alphanumeric)"""
         return bool(item_id) and item_id.isalnum() # isalnum will reject "E-1" or with '_'
+
+    @log_operation
+    def read_from_file(self, filename: str) -> None:
+        """Populates inventory from CSV file"""
+        headers = ['item_id', 'category', 'name', 'quantity', 'price', 'extra']
+
+        try:
+            with open(filename, mode='r', encoding='utf-8') as file:
+                reader = csv.DictReader(file, fieldnames=headers)
+
+                for row in reader:
+                    # strip whitespaces just in case 
+                    item_id = row['item_id'].strip()
+                    category = row['category'].strip()
+                    name = row['name'].strip()
+
+                    # Typecast numeric values
+                    quantity = int(row['quantity'].strip())
+                    price = float(row['price'].strip())
+                    extra = row['extra'].strip()
+
+                    item: Item # prevent type error
+                    if category == 'Electronics':
+                        # extra represents warranty_months (int)
+                        item = Electronics(item_id, name, quantity, price, int(extra))
+                    elif category == 'Grocery':
+                        # extra represents expiration_date (str)
+                        item = Grocery(item_id, name, quantity, price, extra)
+                    else:
+                        # Skip unknown categories to prevent crashing
+                        print(f"Warning: Unknown category '{category}' for item '{item_id}' Skipping...")
+                        continue
+
+                    self.add_item(item)
+
+        except OSError as e:
+            # Catches FileNotFoundError PermissionError etc...
+            raise InventoryException(f"Failed to read from file '{filename}'") from e
+        except ValueError as e:
+            # Catches issues if the CSV has bad data (e.g. trying to int() a string like "abc")
+            raise InventoryException(f"Data formatting error in file '{filename}'") from e
+
+    @log_operation
+    def write_to_file(self, filename: str) -> None:
+        """Save current inventory to CSV file"""
+        headers = ['item_id', 'category', 'name', 'quantity', 'price', 'extra']
+        
+        try:
+            # newline='' is required by the csv module to prevent blank lines between rows on Windows
+            with open(filename, mode='w', encoding='utf-8', newline='') as file:
+                writer = csv.DictWriter(file, fieldnames=headers)
+                for item in self:
+                    extra_val: int | str
+                    if isinstance(item, Electronics):
+                        extra_val = item.warranty_months
+                    elif isinstance(item, Grocery):
+                        extra_val = item.expiration_date
+                    
+                    # Build the dictionary for the row
+                    row_data = {
+                        'item_id': item.item_id,
+                        'category': item.category(),
+                        'name': item.name,
+                        'quantity': item.quantity,
+                        'price': f"{item.price:.2f}", # Avoid precision issues 
+                        'extra': extra_val
+                    }
+                    
+                    writer.writerow(row_data)
+                    
+        except OSError as e:
+            raise InventoryException(f"Failed to write to file '{filename}'.") from e
