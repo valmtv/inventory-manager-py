@@ -8,7 +8,7 @@ from core.exceptions import (
     InvalidValueException,
     InventoryException
 )
-import os
+from typing import cast
 
 # shared fixtures
 def make_items():
@@ -117,7 +117,7 @@ def test_invalid_value():
         inv._items["E1"].price = -100
         
 def test_read_from_file():
-    """Tests reading and creating inventory from the inventory.csv"""
+    """Tests reading and creating inventory from inventory.csv"""
     inv = Inventory()
     inv.read_from_file("inventory.csv")
     
@@ -133,3 +133,21 @@ def test_read_from_file_not_found():
     inv = Inventory()
     with pytest.raises(InventoryException):
         inv.read_from_file("this_file_does_not_exist.csv")
+        
+def test_write_to_file(tmp_path):
+    inv = make_inventory()
+    filepath = tmp_path / "test_output.csv"
+    inv.write_to_file(str(filepath))
+
+    assert filepath.exists()
+    assert filepath.stat().st_size > 0
+
+    # read it back and check contents
+    inv2 = Inventory()
+    inv2.read_from_file(str(filepath))
+    assert len(inv2) == 4
+    assert "E1" in inv2
+    assert "G2" in inv2
+    assert inv2._items["E1"].price == 699.99
+    assert cast(Electronics, inv2._items["E2"]).warranty_months == 12
+    assert cast(Grocery, inv2._items["G1"]).expiration_date == "2026-06-01"
