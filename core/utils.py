@@ -1,4 +1,6 @@
 from typing import Callable, Any
+from core.models import Item 
+from core.inventory import Inventory
 
 # Dependancy injection function wrappers
 def filter_items(inventory: Inventory, predicate: Callable[[Item], bool]) -> list[Item]:
