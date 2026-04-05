@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from core.exceptions import InvalidValueException
 
 class Item(ABC):
 
@@ -6,7 +7,7 @@ class Item(ABC):
     __slots__ = ('_item_id', '_name', '_quantity', '_price')
 
     def __init__(self, item_id: str, name: str, quantity: int, price: float):
-        # self.atribute will trigger the setters, so will be protected at the very end
+        # self.attribute will trigger the setters, so will be protected at the very end
         self.item_id = item_id
         self.name = name
         self.quantity = quantity
@@ -35,6 +36,8 @@ class Item(ABC):
 
     @quantity.setter
     def quantity(self, value: int) -> None:
+        if value < 0:
+            raise InvalidValueException("Quantity cannot be negative.") from None
         self._quantity = value
 
     @property
@@ -43,8 +46,9 @@ class Item(ABC):
 
     @price.setter
     def price(self, value: float) -> None:
+        if value < 0:
+            raise InvalidValueException("Price cannot be negative.") from None
         self._price = value
-
 
     @abstractmethod
     def display(self) -> str:
