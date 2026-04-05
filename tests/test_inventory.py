@@ -1,6 +1,6 @@
 from core.models import Electronics, Grocery
 from core.inventory import Inventory
-from core.utils import filter_items
+from core.utils import filter_items, sort_items 
 
 # Basic functionality
 inv = Inventory()
@@ -52,5 +52,19 @@ assert len(cheap) == 2  # Apple and Milk
 
 electronics_only = filter_items(inv, lambda item: item.category() == "Electronics")
 assert len(electronics_only) == 2
+
+# sort_items
+sorted_by_price = sort_items(inv2, key_fn=lambda item: item.price)
+prices = [item.price for item in sorted_by_price]
+assert prices == sorted(prices)  # should be already sorted 
+
+sorted_by_price_desc = sort_items(inv2, key_fn=lambda item: item.price, reverse=True)
+prices_desc = [item.price for item in sorted_by_price_desc]
+assert prices_desc == sorted(prices_desc, reverse=True)
+
+sorted_by_name = sort_items(inv2, key_fn=lambda item: item.name)
+assert sorted_by_name[0].name == "Apple"
+
+
 
 print("All correct")
