@@ -48,15 +48,15 @@ class Inventory:
     def remove_item(self, item_id: str) -> None:
         try:
             del self._items[item_id]
-        except KeyError:
-            raise ItemNotFoundException(item_id, f"Item with ID '{item_id}' not found.") from None
+        except KeyError as e:
+            raise ItemNotFoundException(item_id, f"Item with ID '{item_id}' not found.") from e
 
     @log_operation
     def update_quantity(self, item_id: str, quantity: int) -> None:
         try:
             self._items[item_id].quantity = quantity
-        except KeyError:
-            raise ItemNotFoundException(item_id, f"Item with ID '{item_id}' not found.") from None
+        except KeyError as e:
+            raise ItemNotFoundException(item_id, f"Item with ID '{item_id}' not found.") from e
 
     def display_inventory(self) -> None:
         # Works because of __iter__
