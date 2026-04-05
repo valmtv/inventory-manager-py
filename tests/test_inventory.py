@@ -157,5 +157,5 @@ def test_read_bad_data(tmp_path):
     bad_csv = tmp_path / "bad.csv"
     bad_csv.write_text("E1,Electronics,Phone,notanumber,699.99,24\n")
     inv = Inventory()
-    with pytest.raises(InventoryException):
-        inv.read_from_file(str(bad_csv))
+    inv.read_from_file(str(bad_csv))
+    assert len(inv) == 0

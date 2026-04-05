@@ -80,6 +80,7 @@ class Inventory:
     def from_list(cls, items: list[Item]) -> "Inventory":
         """Creates an Inventory instance from a list of Item objects"""
         inventory = cls()
+        # This will bypass add_item() so no validation, but stated in task requirement
         inventory._items = {item.item_id: item for item in items}
         return inventory
 
